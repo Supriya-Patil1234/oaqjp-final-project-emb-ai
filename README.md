@@ -1,3 +1,4 @@
+# Final Project
 # Emotion Detector Application
 
 An AI-based web application leveraging IBM Watson NLP and Flask to analyze emotions from text inputs.
