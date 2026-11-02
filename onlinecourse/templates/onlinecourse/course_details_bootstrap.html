@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ course.name }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Online Course</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li>
+                <a class="btn btn-link" href="#">{{ user.first_name }} ({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li>
+                <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Username" name="username">
+                        <input type="password" class="form-control" placeholder="Password" name="password">
+                        <button class="btn btn-primary" type="submit">Login</button>
+                    </div>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>{{ course.name }}</h2>
+    <p>{{ course.description }}</p>
+
+    {% if user.is_authenticated %}
+    <h3 class="mt-4">Exam</h3>
+    <form id="question-form" action="{% url 'onlinecourse:submit' course.id %}" method="post">
+        {% csrf_token %}
+        {% for lesson in course.lesson_set.all %}
+            {% for question in lesson.question_set.all %}
+            <div class="card mt-3">
+                <div class="card-header font-weight-bold">{{ question.question_text }}</div>
+                <div class="card-body">
+                    {% for choice in question.choice_set.all %}
+                    <div class="form-check">
+                        <input type="checkbox" name="choice_{{ choice.id }}" id="choice_{{ choice.id }}" value="{{ choice.id }}" class="form-check-input">
+                        <label for="choice_{{ choice.id }}" class="form-check-label">{{ choice.choice_text }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% endfor %}
+        <input class="btn btn-primary btn-block mt-4 mb-5" type="submit" value="Submit Exam">
+    </form>
+    {% else %}
+    <div class="alert alert-warning mt-4">Please log in to take the exam.</div>
+    {% endif %}
+</div>
+</body>
+</html>

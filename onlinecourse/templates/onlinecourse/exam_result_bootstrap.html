@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    {% if grade >= 80 %}
+    <div class="alert alert-success">
+        <h3>Congratulations, {{ user.username }}! You passed the exam with score {{ grade }}/100</h3>
+    </div>
+    {% else %}
+    <div class="alert alert-danger">
+        <h3>Failed. Your score is {{ grade }}/100. Please try again.</h3>
+    </div>
+    {% endif %}
+
+    <h4>Exam Results</h4>
+    {% for lesson in course.lesson_set.all %}
+        {% for question in lesson.question_set.all %}
+        <div class="card mt-3">
+            <div class="card-header font-weight-bold">{{ question.question_text }}</div>
+            <div class="card-body">
+                {% for choice in question.choice_set.all %}
+                <div class="form-check">
+                    <input type="checkbox" disabled {% if choice.id in selected_ids %}checked{% endif %} class="form-check-input">
+                    <label class="form-check-label {% if choice.is_correct %}text-success font-weight-bold{% endif %}">
+                        {{ choice.choice_text }}
+                        {% if choice.is_correct %}(Correct Answer){% endif %}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% endfor %}
+    
+    <a href="{% url 'onlinecourse:course_details' course.id %}" class="btn btn-secondary mt-4 mb-5">Back to Course</a>
+</div>
+</body>
+</html>
